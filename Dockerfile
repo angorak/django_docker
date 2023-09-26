@@ -1,17 +1,21 @@
 # Pull base image
-FROM python:3.10.5-slim-bullseye
+FROM python:3.10.5-alpine
 
-# Set environment variables
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
+WORKDIR /app
+
+# set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set work directory
-WORKDIR /code
+# install psycopg2 dependencies
+RUN apk update \
+    && apk add postgresql-dev gcc python3-dev musl-dev
 
-# Install dependencies
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+# install dependencies
+COPY requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+
+# copy project
 COPY . .
